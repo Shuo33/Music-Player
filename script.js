@@ -18,16 +18,16 @@ const songs = ['hey', 'summer', 'ukulele'];
 // Keep track of song
 let songIndex = 2; 
 
-// Initially load song details into DOM 
-loadSong(songs[songIndex]); 
 
-
-// Update song details
+// Update song details to the DOM
 function loadSong(song) {
     title.innerText = song; 
     audio.src = `music/${song}.mp3`;
     cover.src = `images/${song}.jpg`; 
 }
+
+// Initially load song details 
+loadSong(songs[songIndex]); 
 
 
 // Play song
@@ -50,6 +50,59 @@ function pauseSong() {
 }
 
 
+// Prev song
+function prevSong() {
+    songIndex--; 
+
+    if (songIndex < 0) {
+        songIndex = songs.length - 1; 
+    }
+
+    loadSong(songs[songIndex]);
+
+    playSong();
+}
+
+
+
+// Next song
+function nextSong() {
+    songIndex++; 
+
+    if (songIndex > songs.length - 1) {
+        songIndex = 0; 
+    }
+
+    loadSong(songs[songIndex]);
+
+    playSong();
+}
+
+
+// Update progress bar 
+function updateProgress(e) {
+    const { currentTime, duration } = e.target; 
+    const percentage = (currentTime / duration) * 100;
+
+    progress.style.width = `${percentage}%`;
+}
+
+// Click on progress bar
+function setProgress(e) {
+    // the total length of the progress bar that got clicked
+    const width = this.clientWidth; 
+
+    // the length where the bar get clicked
+    const clickX = e.offsetX;
+
+    const duration = audio.duration; 
+
+    audio.currentTime = (clickX / width) * duration; 
+}
+
+
+
+
 // Event listeners 
 playBtn.addEventListener('click', () => {
     const isPlaying = musicContainer.classList.contains('play');
@@ -60,3 +113,17 @@ playBtn.addEventListener('click', () => {
         playSong();
     }
 });
+
+
+// Change song
+prevBtn.addEventListener('click', prevSong);
+nextBtn.addEventListener('click', nextSong);
+
+// Time/song update: 'timeupdate' event is fired when the time indicated by the 'currentTime' attribute has been updated
+audio.addEventListener('timeupdate', updateProgress);
+
+// Click on progress bar
+progressContainer.addEventListener('click', setProgress);
+
+// Song ends
+audio.addEventListener('ended', nextSong);
